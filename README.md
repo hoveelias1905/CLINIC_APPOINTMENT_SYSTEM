@@ -1,56 +1,118 @@
-# CLINIC_APPOINTMENT_SYSTEM 
-Elias S Hove R2420399 ,Tariro Tshuma R2420382
+# CLINIC APPOINTMENT SYSTEM
 
-CLINIC APPOINTMENT SYSTEM
-Programming Language: Python
-P Value: 10
+**Group Members:**
 
-Question 1: Classes Used
-This project is a clinic appointment system that allows patients to book appointments with medical staff. It also allows appointments to be confirmed and cancelled.
+Elias S Hove — R2420399  
+Tariro Tshuma — R2420382
 
-The following classes are used:
+Programming Language: Python  
+Value of P: 10
 
-Person: The parent class that stores a person's name and ID.
-Patient: Represents a patient who wants an appointment.
-Staff: An abstract class for clinic employees.
-Doctor: A staff member who charges 40.
-Nurse: A staff member who charges 11.
-Pharmacist: A staff member who charges 5.
-Appointment: Stores appointment details such as patient, staff, starting hour and status.
-Clinic: Manages patients, staff and appointments.
-Clock: Provides the current hour.
-Lecturer: Stores the module taught by a lecturer.
-MedicalLecturer: Combines the Doctor and Lecturer classes.
-The class diagram is shown below this README.
 
-Question 2: Encapsulation and Appointment Status
-I used private attributes to protect the information stored inside the classes.
+
+
+## Question 1: Classes Used
+
+Our project is a clinic appointment system that allows patients to book appointments with medical staff. Appointments can also be confirmed or cancelled.
+
+We created the following classes:
+
+1. **Person:** An abstract class that stores a person's name and ID and defines the abstract `role()` method.
+2. **Patient:** Inherits from Person and represents a patient booking an appointment.
+3. **Staff:** An abstract class that inherits from Person and defines the abstract `fee()` method.
+4. **Doctor:** Inherits from Staff and represents a doctor.
+5. **Nurse:** Inherits from Staff and represents a nurse.
+6. **Pharmacist:** Inherits from Staff and represents a pharmacist.
+7. **Appointment:** Stores the appointment ID, patient, staff member, starting hour and status.
+8. **Clinic:** Manages registered people and appointments.
+
+### Class Diagram
+
+                                    Person (abstract)
+                         - name
+                         - id
+                         + role() [abstract]
+                                |
+                  +-------------+-------------+
+                  |                           |
+               Patient                  Staff (abstract)
+               + role()                 + fee() [abstract]
+                                        + bufferHours() [abstract]
+                                               |
+                              +----------------+----------------+
+                              |                |                |
+                           Doctor            Nurse          Pharmacist
+                           + role()          + role()        + role()
+                           + fee()           + fee()         + fee()
+                           + bufferHours()   + bufferHours() + bufferHours()
+
+
+    Clinic --------------------> Appointment
+      |                            |
+      |                            +----------> Patient
+      |                            |
+      |                            +----------> Staff
+      |
+      +---- uses --------------> Clock
+      |
+      +---- uses --------------> AppointmentLog
+
+
+    Appointment ----------------> Status
+                                  PENDING
+                                  CONFIRMED
+                                  CANCELLED
+
+
+    Doctor --------------------> MedicalLecturer
+                                     |
+                                     +----------> Lecturer
+                                                  - module
+                                                  + role()
+
+
+
+
+
+
+
+## Question 2: Encapsulation and Appointment Status
+
+We used private attributes to protect information stored in the classes.
 
 In Python, attributes beginning with two underscores are name-mangled, which helps prevent accidental direct access.
 
-When returning a list of appointments, the program returns a copy instead of the original list. This prevents another part of the program from changing the clinic's appointments directly.
+The Clinic returns a tuple of appointments instead of its internal dictionary. This prevents other parts of the program from directly changing the appointment collection.
 
-An appointment can have three statuses:
+Appointments have three possible statuses:
 
-PENDING
-CONFIRMED
-CANCELLED
-The allowed changes are:
+- PENDING
+- CONFIRMED
+- CANCELLED
 
-PENDING → CONFIRMED
-PENDING → CANCELLED
+The legal status changes are:
+
+PENDING → CONFIRMED  
+PENDING → CANCELLED  
 CONFIRMED → CANCELLED
 
 A cancelled appointment cannot become active again.
 
-A confirmed appointment cannot be cancelled when less than 2 hours remain before its starting time.
+A confirmed appointment cannot be cancelled less than two hours before its starting time. No appointment can be cancelled once it has started.
 
-An appointment cannot be cancelled after it has started.
+Constructors reject empty names and IDs that are zero or negative by raising `ValueError`.
 
-Constructors reject empty names and IDs that are zero or negative by raising ValueError.
+The invariants of Appointment and Clinic are written as comments above the classes in the source code.
 
-Question 3: Polymorphism and Fees
-For this project, P = 10.
+
+
+
+
+
+
+## Question 3: Polymorphism and Fees
+
+For our project, P = 10.
 
 Doctor's fee:
 
@@ -64,145 +126,209 @@ Pharmacist's fee:
 
 5
 
-Staff	Fee
-Doctor	40
-Nurse	11
-Pharmacist	5
-I used polymorphism so that each staff class provides its own fee() method.
+| Staff | Fee |
+|---|---|
+| Doctor | 40 |
+| Nurse | 11 |
+| Pharmacist | 5 |
 
-The program calls role() and fee() in one loop without checking the staff member's type.
+We used polymorphism by giving each staff class its own `fee()` and `role()` methods.
 
-If another staff class is added, the same loop can still be used.
+The program uses one loop to display the role and fee of each staff member without checking the staff member's type.
 
-Question 4: Appointment Logging
-The clinic records successful and failed actions in a log file.
+This means another Staff subclass can be added without changing the loop or Clinic.
 
-I used Python's with statement to open and close the file.
 
-The program displays:
 
+
+
+
+
+## Question 4: Appointment Logging
+
+The Clinic records successful and failed actions in an appointment log.
+
+We used Python's `with` statement to open and close the log file.
+
+When the log is used, the program displays:
+
+```text
 [log] opened
 [log] closed
+```
 
-The with statement closes the file even when an error occurs during the operation.
+The `with` statement makes sure the file is closed even if an error occurs during the operation.
 
-A failed action is also recorded. For example:
+Failed operations are also recorded. For example:
 
+```text
 FAILED cancel #3: too late
+```
 
-If writing to the file fails, the program should report the logging error rather than pretending that the action was logged successfully.
+This helps us identify which operations were successful and which ones failed.
 
-Question 5: Multiple Inheritance
-I created a Lecturer class with a module name.
 
-The MedicalLecturer class inherits from Doctor and Lecturer.
 
-Its role() method returns:
 
+
+
+
+## Question 5: Multiple Inheritance
+
+We created a Lecturer class that stores a module name.
+
+MedicalLecturer inherits from both Doctor and Lecturer.
+
+Its `role()` method returns:
+
+```text
 Doctor and Lecturer
+```
 
-I used super() and cooperative constructors so that Person is initialized only once.
+We used `super()` and cooperative constructors so that Person is initialized only once.
 
 A counter in the Person constructor is used to demonstrate this.
 
-MedicalLecturer uses the Doctor fee, which is 40 for P = 10, because it is providing a medical service as a doctor.
+MedicalLecturer returns a fee of 40 because it provides the same medical service as Doctor.
 
 In Java, Lecturer would be an interface because Java does not allow a class to extend two classes. MedicalLecturer would extend Doctor and implement Lecturer.
 
-Question 6: Booking Rules and Buffer
-The clinic checks that a patient or staff member does not have two active appointments at the same hour.
 
-It also checks that IDs are unique within the clinic.
+
+
+
+
+## Question 6: Booking Rules and Buffer
+
+The Clinic checks that a patient or staff member does not have two active appointments at the same hour.
+
+It also checks that IDs are unique.
 
 For this project:
 
 10 % 4 = 2
 
-Therefore, the assigned feature is Buffer.
+Therefore, our assigned feature is **Buffer**.
 
-The buffer requirements are:
+| Staff     |     Buffer |
+|-----------|------------|
+| Doctor    | 2 hours    |
+| Nurse     | 1 hour     |
+| Pharmacist| 0 hours    |
 
-Staff	Buffer
-Doctor	2 hours
-Nurse	1 hour
-Pharmacist	0 hours
 Every appointment lasts exactly one hour.
 
-For example, if a doctor has an appointment starting at hour 10, the next appointment with that doctor can start at hour 13.
+For example, if a doctor has an appointment starting at hour 10, another appointment with the same doctor can start at hour 13.
 
 This leaves hours 11 and 12 free.
 
-The Clinic calls bufferHours() on the staff object instead of checking whether the staff member is a doctor, nurse or pharmacist.
+The Clinic gets the required gap by calling `bufferHours()` on the staff object instead of checking the staff member's type.
 
-If a booking breaks a rule, the program rejects it and records the failed attempt.
+If a booking breaks any rule, it is rejected and the failed attempt is recorded in the log.
 
-Question 7: Design Decisions
-D1. Where does the 2-hour cancellation rule belong?
-I placed the rule in the Appointment class because it controls whether an appointment can change its status.
 
-I also considered placing it in Clinic, but this would make Clinic responsible for more rules.
 
-The advantage of keeping it in Appointment is that the rule stays close to the information it uses.
 
-D2. Why is the clock testable?
-The program gets the current hour from a Clock object instead of reading the computer's time.
 
-This allows me to set a particular hour when testing.
 
-For example, I can set the clock to hour 9 and test an appointment starting at hour 10.
+## Question 7: Design Decision Log
 
-If the program used the computer's actual time, testing exact cancellation deadlines would be harder.
+### D1. Where does the 2-hour cancellation rule belong?
 
-D3. What changed when Pharmacist was added?
-I added the Pharmacist class and gave it its own fee and buffer methods.
+We placed the rule in the Appointment class because Appointment controls its own status.
 
-The Clinic and staff-printing loop did not need type checks.
+We also considered placing it in Clinic, but this would give Clinic more responsibilities.
 
-The demonstration code was updated to create a pharmacist.
+Keeping the rule in Appointment makes the code easier to understand and maintain.
 
-D4. What should MedicalLecturer.fee() return?
-It should return 40 because it uses the Doctor fee.
+### D2. Why is the clock design testable?
 
-Python's method resolution order and cooperative super() calls allow the shared Person constructor to run once.
+We created a Clock class that stores the current hour.
 
-Without proper constructor cooperation, Person might be initialized more than once, or one parent class might not be initialized correctly.
+The program calls `Clock.now()` instead of reading the computer's actual time.
 
-D5. What happens when logging fails?
-If the log cannot be written or closed, the program should report the error.
+This allows us to set different hours during testing.
 
-It should not display a successful logging message when the file operation failed.
+For example, we can set the clock to hour 9 and test whether an appointment starting at hour 10 can be cancelled.
 
-A failed log operation must not be silently ignored.
+Using the actual computer time would make it difficult to test specific cancellation deadlines.
 
-D6. Why use bufferHours() instead of checking types?
-Each staff class knows how much time it needs between appointments.
+### D3. What changed when Pharmacist was added?
+
+We added the Pharmacist class and implemented its `role()`, `fee()` and `bufferHours()` methods.
+
+We also added a pharmacist object to the demonstration.
+
+The Clinic and staff-printing loop did not need to be changed because they use polymorphism.
+
+### D4. What should MedicalLecturer.fee() return?
+
+MedicalLecturer returns 40 because it inherits the Doctor fee.
+
+Python's method resolution order and cooperative `super()` calls allow Person to be initialized once.
+
+Without proper constructor cooperation, Person could be initialized twice or one of the parent classes might not be initialized correctly.
+
+### D5. What happens when logging fails?
+
+If writing to or closing the log fails, the program should report the error.
+
+It should not silently ignore the failure or claim that logging was successful.
+
+This is important because the log is used to keep records of clinic operations.
+
+### D6. Why use bufferHours() instead of checking types?
+
+We used `bufferHours()` because each staff class knows how much time it needs between appointments.
 
 Doctor returns 2, Nurse returns 1 and Pharmacist returns 0.
 
-The Clinic simply calls bufferHours().
+Clinic calls the same method for every staff member.
 
-This makes the program easier to extend because a new staff class can provide its own buffer without changing the Clinic's booking logic.
+This makes it easier to add another staff class without changing the Clinic's booking rules.
 
-Question 8: Program Demonstration
-The main.py file demonstrates the following:
 
-Creating patients and staff.
-Printing staff roles and fees.
-Booking appointments.
-Confirming appointments.
-Cancelling appointments.
-Rejecting appointments that break booking rules.
-Applying the staff buffer rules.
-Recording successful and failed actions.
-Demonstrating MedicalLecturer and the Person constructor counter.
-The program also includes a deliberate failed booking to show that the rules are working.
 
-For the unseen change request, the existing class structure allows new staff types or different buffer values to be added without rewriting the booking loop.
 
-How to Run
-Save clinic.py and main.py in the same folder.
 
-Open a terminal in that folder and enter:
 
+
+
+## Question 8: Program Demonstration
+
+Our `main.py` demonstrates the following:
+
+1. Creating patients and staff.
+2. Displaying staff roles and fees.
+3. Booking appointments.
+4. Confirming appointments.
+5. Cancelling appointments.
+6. Rejecting bookings that break the rules.
+7. Applying the buffer rules.
+8. Recording successful and failed operations.
+9. Demonstrating MedicalLecturer and the Person constructor counter.
+
+We also included deliberate failures to show that the appointment rules are working.
+
+The program is designed so that new staff classes can be added without changing the existing booking logic.
+
+---
+
+<!-- ## Running the Program
+
+The project contains the following files:
+
+```text
+Clinic_Appointment_System/
+    clinic.py
+    main.py
+    README.md
+```
+
+To run the program, open the project folder in VS Code and enter:
+
+```bash
 python main.py
-The program will display the appointment operations and create an appointment log.
+```
+
+The program displays the appointment operations and creates an `appointments.log` file. -->
